@@ -1,0 +1,71 @@
+const express = require("express");
+const router = express.Router();
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const User = require("../database/user_model");
+
+router.post("/register", async (req, res) => {
+  const { email, name, password } = req.body;
+
+  if (!email || !password || !name) {
+    return res.status(400).json({ message: "Missing fields" });
+  }
+
+  try {
+    const existingUser = await User.findOne({ email: email });
+    if (existingUser) {
+      res.status(409).json({ message: "Email already in use." });
+      return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const newUser = new User({
+      email,
+      name,
+      password: hashedPassword,
+    });
+
+    await newUser.save();
+
+    res.status(201).json({ message: "User created!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({ message: "Missing fields" });
+    return;
+  }
+
+  User.findOne({ email })
+    .then(async (usr) => {
+      if (usr) {
+        if (await bcrypt.compare(password, usr.password)) {
+          const token = jwt.sign(
+            { email, id: usr._id, type: "parent" },
+            process.env.JWT_SECRET
+          );
+          res
+            .status(200)
+            .json({ token, name: usr.name, message: "User authenticated" });
+        } else {
+          res.status(404).json({ message: "Incorrect Password" });
+        }
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json("Database errro");
+    });
+});
+
+module.exports = router;
