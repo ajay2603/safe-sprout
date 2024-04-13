@@ -13,5 +13,8 @@ mongoose.connect(
 const userRoutes = require("./routes/auth");
 app.use("/user/auth", userRoutes);
 
+const childRoutes = require("./routes/child");
+app.use("/child", childRoutes);
+
 const PORT = 4000;
 app.listen(PORT, () => console.log("Server running on port: " + PORT));

@@ -4,7 +4,8 @@
   "description": "\"backend for safe sprout mobile app\"",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "app": "npx nodemon app.js"
   },
   "author": "J.A.Rama Raju",
   "license": "ISC",

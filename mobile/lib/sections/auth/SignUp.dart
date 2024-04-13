@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../global/consts.dart';
+
 class SignUp extends StatefulWidget {
   Function? toggleDisp;
   SignUp({Key? key, required this.toggleDisp}) : super(key: key);
@@ -47,13 +49,12 @@ class _SignUp extends State<SignUp> {
       return;
     }
     try {
-      var response = await http.Client().post(
-          Uri.parse("http://192.168.29.82:4000/user/auth/register"),
-          body: {
-            "name": _nameController.text,
-            "email": _emailController.text,
-            "password": _passwordController.text,
-          });
+      var response = await http.Client()
+          .post(Uri.parse("${serverURL}/user/auth/register"), body: {
+        "name": _nameController.text,
+        "email": _emailController.text,
+        "password": _passwordController.text,
+      });
       if (response.statusCode >= 200 && response.statusCode < 300) {
         ;
         _handleToggle();
