@@ -45,7 +45,7 @@ class _ChildListItem extends State<ChildListItem> {
   String setStatus(tracking, live, safe) {
     return (tracking)
         ? (live ? (safe ? "safe" : "off route") : "offline")
-        : "- -";
+        : "Not tracking";
   }
 
   Future<void> getDetails() async {

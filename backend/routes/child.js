@@ -7,11 +7,9 @@ const User = require("../database/user_model");
 
 router.get("/all", async (req, res) => {
   const token = req.headers.authorization;
-  console.log(token);
   try {
     try {
       var decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(decoded);
     } catch (err) {
       console.error(err);
       res.status(401).json({ message: "user not autunticated" });
