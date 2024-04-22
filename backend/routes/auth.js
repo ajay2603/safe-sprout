@@ -68,4 +68,15 @@ router.post("/login", (req, res) => {
     });
 });
 
+router.post("/validate-token", (req, res) => {
+  const token = req.headers.authorization;
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    if (payload) res.status(200).json({ message: "user authorized" });
+    else res.status(401).json({ message: "user not authorized" });
+  } catch (err) {
+    res.status(401).json({ message: "user not authorized" });
+  }
+});
+
 module.exports = router;

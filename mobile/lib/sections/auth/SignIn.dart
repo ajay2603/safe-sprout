@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import '../../utilities/secure_storage.dart';
 import "../../global/consts.dart";
+import '../../utilities/dialogs.dart';
 
 class SignIn extends StatefulWidget {
   Function? toggleDisp;
@@ -13,26 +14,6 @@ class SignIn extends StatefulWidget {
 
 class _SignIn extends State<SignIn> {
   final double _gap = 20;
-
-  void alertDialog(String title, String description) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(description),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -51,11 +32,12 @@ class _SignIn extends State<SignIn> {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         Map data = jsonDecode(response.body);
         await setKey("token", data['token']);
+        await setKey("type", "parent");
         Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (err) {
       print(err);
-      alertDialog("Error", "Error in login");
+      alertDialog("Error", "Error in login", context);
     }
   }
 

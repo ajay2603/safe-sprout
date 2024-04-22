@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/global/socket.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 import "../sections/home/Map.dart";
 import '../utilities/secure_storage.dart';
+import '../sections/home/Children.dart';
 
 class Home extends StatefulWidget {
+  Home({super.key}) {
+    socketInit();
+  }
   @override
   _Home createState() => _Home();
 }
 
 class _Home extends State<Home> {
   int _selectedIndex = 0;
+
+  _Home() {
+    socketEvents();
+  }
+
+  void socketEvents() {
+    socket;
+    socket?.onConnect((data) => print("connected"));
+    socket?.onDisconnect((data) => print("disconnect"));
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -17,7 +33,7 @@ class _Home extends State<Home> {
   }
 
   List<Widget> _sections = [
-    Center(child: Text("Home")),
+    Children(),
     Map(), // Place
   ];
 
@@ -29,7 +45,12 @@ class _Home extends State<Home> {
           centerTitle: false,
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                await removeKey("token");
+                await removeKey("type");
+                socket?.disconnect();
+                Navigator.pushReplacementNamed(context, "/");
+              },
               icon: Icon(Icons.logout_rounded),
             ),
           ],

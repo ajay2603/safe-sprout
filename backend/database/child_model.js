@@ -23,6 +23,10 @@ const childSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  safe: {
+    type: Boolean,
+    default: true,
+  },
   history: [
     {
       date: {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../global/consts.dart';
+import '../../utilities/dialogs.dart';
 
 class SignUp extends StatefulWidget {
   Function? toggleDisp;
@@ -17,26 +18,6 @@ class _SignUp extends State<SignUp> {
     widget.toggleDisp!();
   }
 
-  void alertDialog(String title, String description) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(description),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
@@ -44,8 +25,8 @@ class _SignUp extends State<SignUp> {
 
   void handleSignUp() async {
     if (_confirmPasswordController.value != _passwordController.value) {
-      alertDialog(
-          "Warning Message", "Password and confirm password should be same");
+      alertDialog("Warning Message",
+          "Password and confirm password should be same", context);
       return;
     }
     try {
@@ -64,27 +45,10 @@ class _SignUp extends State<SignUp> {
 
         if (body.containsKey("message")) errorMsg = body['message'];
 
-        alertDialog("Error Message", errorMsg);
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Error Message"),
-              content: Text(errorMsg),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        alertDialog("Error Message", errorMsg, context);
       }
     } catch (err) {
-      alertDialog("Network Error", "Unable to send request");
+      alertDialog("Network Error", "Unable to send request", context);
       print(err);
     }
   }

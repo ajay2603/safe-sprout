@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -13,14 +15,15 @@ class _Map extends State<Map> {
 
   MapController _mapController = MapController();
 
+  bool initSt = true;
+
   @override
   void initState() {
     super.initState();
-    _initGetCurrentLocation();
+    _getCurrentLocation();
   }
 
-  Future<void> _initGetCurrentLocation() async {
-    // Check if permission is granted
+  Future<void> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       // If permission is denied, request it
@@ -32,24 +35,17 @@ class _Map extends State<Map> {
       }
     }
 
-    // Get current position if permission is granted
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      _currentLocation = LatLng(position.latitude, position.longitude);
-      _mapController.move(_currentLocation, 12);
+    var positionStream = await Geolocator.getPositionStream(
+            locationSettings: LocationSettings(accuracy: LocationAccuracy.best))
+        .listen((position) {
+      setState(() {
+        _currentLocation = LatLng(position.latitude, position.longitude);
+        if (initSt) {
+          _mapController.move(_currentLocation, 18.5);
+          initSt = !initSt;
+        }
+      });
     });
-    _getCurrentLocation();
-  }
-
-  Future<void> _getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      _currentLocation = LatLng(position.latitude, position.longitude);
-    });
-
-    Future.delayed(Duration(seconds: 1), _getCurrentLocation);
   }
 
   @override
@@ -71,6 +67,7 @@ class _Map extends State<Map> {
               point: _currentLocation,
               width: 80,
               height: 80,
+              rotate: true,
               child: Column(
                 children: [
                   Icon(

@@ -16,5 +16,12 @@ app.use("/user/auth", userRoutes);
 const childRoutes = require("./routes/child");
 app.use("/child", childRoutes);
 
+const http = require("http");
+const server = http.createServer(app);
+const socketIO = require("socket.io");
+const IO = socketIO(server);
+const { initIO } = require("./sockets/socket");
+initIO(IO);
+
 const PORT = 4000;
-app.listen(PORT, () => console.log("Server running on port: " + PORT));
+server.listen(PORT, () => console.log("Server running on port: " + PORT));
