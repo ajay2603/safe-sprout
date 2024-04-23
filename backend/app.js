@@ -10,11 +10,14 @@ mongoose.connect(
   "mongodb://127.0.0.1:27017/safeSproutDB?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1"
 );
 
-const userRoutes = require("./routes/auth");
-app.use("/user/auth", userRoutes);
+const userAuthRoutes = require("./routes/auth");
+app.use("/user/auth", userAuthRoutes);
 
 const childRoutes = require("./routes/child");
 app.use("/child", childRoutes);
+
+const userRoutes = require("./routes/user");
+app.use("/user", userRoutes);
 
 const http = require("http");
 const server = http.createServer(app);

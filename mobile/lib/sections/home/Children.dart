@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import "package:flutter/material.dart";
+import 'package:mobile/providers/ChildrenListProvider.dart';
 import '../../components/home/ChildListItem.dart';
 import "package:http/http.dart" as http;
 import '../../global/consts.dart';
 import '../../utilities/secure_storage.dart';
 import '../../utilities/dialogs.dart';
+import 'package:provider/provider.dart';
 
 class Children extends StatefulWidget {
   @override
@@ -19,8 +21,6 @@ class _Children extends State<Children> {
     getChildren();
   }
 
-  List idList = [];
-
   Future<void> getChildren() async {
     var token = await getKey('token') ?? "";
     try {
@@ -30,9 +30,9 @@ class _Children extends State<Children> {
       );
       if (response.statusCode == 200) {
         var result = jsonDecode(response.body);
-        setState(() {
-          idList = result["children"];
-        });
+
+        Provider.of<ChildrenListProvider>(context, listen: false)
+            .setChildList(result['children']);
       }
     } catch (err) {
       print(err);
@@ -43,7 +43,8 @@ class _Children extends State<Children> {
 
   @override
   Widget build(BuildContext context) {
-    return (idList.isEmpty)
+    var childrenList = context.watch<ChildrenListProvider>().childrenList;
+    return (childrenList.isEmpty)
         ? Center(
             child: Text(
               "No children added \n Click the bottom button to add Children",
@@ -51,7 +52,8 @@ class _Children extends State<Children> {
             ),
           )
         : ListView.builder(
-            itemCount: idList.length,
-            itemBuilder: (context, index) => ChildListItem(id: idList[index]));
+            itemCount: childrenList.length,
+            itemBuilder: (context, index) =>
+                ChildListItem(id: childrenList[index]));
   }
 }

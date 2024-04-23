@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/providers/ChildrenListProvider.dart';
+import 'package:provider/provider.dart';
 
 import '../global/consts.dart';
 import '../utilities/secure_storage.dart';
@@ -74,6 +76,8 @@ class _NewChild extends State<NewChild> {
           headers: {"Authorization": token});
       Map result = jsonDecode(response.body);
       if (response.statusCode == 200) {
+        Provider.of<ChildrenListProvider>(context, listen: false)
+            .addChild(result['id']);
         alertActionDialog("Ok", result["message"]);
       } else {
         alertDialog("Error", result["message"]);

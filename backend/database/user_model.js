@@ -6,8 +6,11 @@ const userSchema = mongoose.Schema({
   name: { type: String, required: true },
   children: [String],
   homeLocation: {
-    latitude: Number,
-    longitude: Number,
+    type: {
+      latitude: Number,
+      longitude: Number,
+    },
+    default: null,
   },
 });
 
