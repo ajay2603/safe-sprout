@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile/providers/LocationProvider.dart';
 import 'package:mobile/screens/Home.dart';
 import 'package:provider/provider.dart';
 import './screens/Validation.dart';
@@ -24,7 +25,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => ChildrenListProvider(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (context) => LocationProvider(),
+        ),
       ],
       child: MaterialApp(
         title: "My First App",

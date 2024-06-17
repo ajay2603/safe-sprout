@@ -8,6 +8,10 @@ const initIO = (IO) => {
     socket.on("disconnect", () => {
       console.log("disconnect");
     });
+
+    socket.on("location", (data) => {
+      console.log(data);
+    });
   });
 };
 

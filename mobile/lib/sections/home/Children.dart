@@ -43,17 +43,23 @@ class _Children extends State<Children> {
 
   @override
   Widget build(BuildContext context) {
-    var childrenList = context.watch<ChildrenListProvider>().childrenList;
-    return (childrenList.isEmpty)
+    var childrenListProvider = context.watch<ChildrenListProvider>();
+
+    return childrenListProvider.childrenMap.isEmpty
         ? Center(
             child: Text(
-              "No children added \n Click the bottom button to add Children",
+              "No children added. Click the button to add children.",
               textAlign: TextAlign.center,
             ),
           )
         : ListView.builder(
-            itemCount: childrenList.length,
-            itemBuilder: (context, index) =>
-                ChildListItem(id: childrenList[index]));
+            itemCount: childrenListProvider.childrenMap.length,
+            itemBuilder: (context, index) {
+              var childId =
+                  childrenListProvider.childrenMap.keys.elementAt(index);
+              var child = childrenListProvider.childrenMap[childId];
+              return ChildListItem(child: child);
+            },
+          );
   }
 }

@@ -77,7 +77,7 @@ class _NewChild extends State<NewChild> {
       Map result = jsonDecode(response.body);
       if (response.statusCode == 200) {
         Provider.of<ChildrenListProvider>(context, listen: false)
-            .addChild(result['id']);
+            .addChild(result['child']);
         alertActionDialog("Ok", result["message"]);
       } else {
         alertDialog("Error", result["message"]);

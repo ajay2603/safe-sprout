@@ -17,6 +17,7 @@ class _ValidationState extends State<Validation> {
   }
 
   Future<void> validateSession() async {
+    print("Called");
     try {
       String token = await getKey("token") ?? "";
       var response = await http.Client().post(
@@ -24,7 +25,17 @@ class _ValidationState extends State<Validation> {
           headers: {"Authorization": token});
       print(response.body);
       if (response.statusCode == 200) {
-        Navigator.pushReplacementNamed(context, '/home');
+        String type = await getKey('type') ?? "";
+        switch (type) {
+          case "parent":
+            Navigator.pushReplacementNamed(context, "/home");
+            break;
+          case "child":
+            Navigator.pushReplacementNamed(context, "/add-child");
+            break;
+          default:
+            Navigator.pushReplacementNamed(context, "/auth");
+        }
       } else {
         Navigator.pushReplacementNamed(context, '/auth');
       }

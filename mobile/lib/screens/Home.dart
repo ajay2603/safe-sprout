@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/global/socket.dart';
+import 'package:mobile/utilities/background-location.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import "../sections/home/Map.dart";
 import '../utilities/secure_storage.dart';
 import '../sections/home/Children.dart';
+
+import '../providers/ChildrenListProvider.dart';
 
 class Home extends StatefulWidget {
   Home({super.key}) {
@@ -39,6 +42,8 @@ class _Home extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    getCurrentLocationStream(context);
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('SafeSprout'),

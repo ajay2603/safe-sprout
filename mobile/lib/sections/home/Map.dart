@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/providers/LocationProvider.dart';
 import 'package:mobile/utilities/dialogs.dart';
 import '../../utilities/secure_storage.dart';
 import '../../global/consts.dart';
@@ -16,7 +16,6 @@ class Map extends StatefulWidget {
 }
 
 class _Map extends State<Map> {
-  LatLng _currentLocation = LatLng(0, 0);
   LatLng _homeLocation = LatLng(0, 0);
 
   LatLng _prevHomeLocation = LatLng(0, 0);
@@ -24,7 +23,6 @@ class _Map extends State<Map> {
   MapController _mapController = MapController();
 
   bool homeDisp = false;
-  bool currentDisp = false;
 
   bool prevHomeDisp = false;
 
@@ -35,7 +33,6 @@ class _Map extends State<Map> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
     getHomeLocation();
   }
 
@@ -58,32 +55,6 @@ class _Map extends State<Map> {
       print(err);
       getHomeLocation();
     }
-  }
-
-  Future<void> _getCurrentLocation() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      // If permission is denied, request it
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
-        // Handle the case if the permission is not granted
-        return;
-      }
-    }
-
-    var positionStream = await Geolocator.getPositionStream(
-            locationSettings: LocationSettings(accuracy: LocationAccuracy.best))
-        .listen((position) {
-      setState(() {
-        currentDisp = true;
-        _currentLocation = LatLng(position.latitude, position.longitude);
-        if (initSt) {
-          _mapController.move(_currentLocation, 18.8);
-          initSt = !initSt;
-        }
-      });
-    });
   }
 
   void handleTap(LatLng point) {
@@ -124,6 +95,9 @@ class _Map extends State<Map> {
 
   @override
   Widget build(BuildContext context) {
+    LatLng _currentLocation = context.watch<LocationProvider>().currentLocation;
+    bool currentDisp = context.watch<LocationProvider>().currentDisp;
+
     return Stack(
       children: [
         FlutterMap(
@@ -169,6 +143,7 @@ class _Map extends State<Map> {
                           point: _homeLocation,
                           width: 130,
                           height: 130,
+                          rotate: true,
                           child: Column(
                             children: [
                               ...(updatingHome)

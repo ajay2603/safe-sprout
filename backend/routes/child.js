@@ -24,9 +24,13 @@ router.get("/all", async (req, res) => {
       return;
     }
 
+    const childrenList = await Child.find({ _id: { $in: usr.children } })
+      .select("_id name live tracking safe lastLocation")
+      .lean();
+
     res
       .status(200)
-      .json({ message: "childern fetched success", children: usr.children });
+      .json({ message: "childern fetched success", children: childrenList });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "internal server error" });
@@ -59,7 +63,18 @@ router.post("/new-child", async (req, res) => {
       const parent = await User.findById(_id);
       parent.children.push(ch._id);
       await parent.save();
-      res.status(200).json({ message: "child added successfully", id: ch._id });
+
+      res.status(200).json({
+        message: "child added successfully",
+        child: {
+          _id: ch._id,
+          name: ch.name,
+          tracking: ch.tracking,
+          safe: ch.safe,
+          live: ch.live,
+          lastLocation: ch.lastLocation,
+        },
+      });
     }
   } catch (err) {
     console.error(err);
