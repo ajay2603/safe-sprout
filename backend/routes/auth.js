@@ -72,8 +72,49 @@ router.post("/validate-token", (req, res) => {
   const token = req.headers.authorization;
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    if (payload) res.status(200).json({ message: "user authorized" });
-    else res.status(401).json({ message: "user not authorized" });
+    if (payload) {
+      User.findOne({ email: payload.email })
+        .then((usr) => {
+          if (usr) {
+            res.status(200).json({ message: "user authorized" });
+          } else {
+            res.status(401).json({ message: "user not authorized" });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ message: "Internal Server error" });
+        });
+    } else res.status(401).json({ message: "user not authorized" });
+  } catch (err) {
+    res.status(401).json({ message: "user not authorized" });
+  }
+});
+
+router.post("/validate-pass", (req, res) => {
+  const token = req.headers.authorization;
+  const password = req.body.password;
+
+  console.log(password);
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    if (payload) {
+      User.findOne({ email: payload.email })
+        .then(async (usr) => {
+          if (usr) {
+            if (await bcrypt.compare(password, usr.password))
+              res.status(200).json({ message: "User authorized" });
+            else res.status(401).json({ message: "Incorrect Password" });
+          } else {
+            res.status(401).json({ message: "user not authorized" });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ message: "Internal Server error" });
+        });
+    } else res.status(401).json({ message: "user not authorized" });
   } catch (err) {
     res.status(401).json({ message: "user not authorized" });
   }

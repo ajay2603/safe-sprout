@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/global/socket.dart';
+import 'package:mobile/sockets/socket.dart';
 import 'package:mobile/utilities/background-location.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import "../sections/home/Map.dart";

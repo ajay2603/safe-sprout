@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile/providers/LocationProvider.dart';
+import 'package:mobile/screens/ChildInfo.dart';
 import 'package:mobile/screens/Home.dart';
 import 'package:provider/provider.dart';
 import './screens/Validation.dart';
@@ -39,6 +40,16 @@ class MyApp extends StatelessWidget {
           "/auth": (context) => Auth(),
           "/home": (context) => Home(),
           "/add-child": (context) => NewChild(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == '/child') {
+            final Child child = settings.arguments as Child;
+            return MaterialPageRoute(
+              builder: (context) => ChildInfo(child: child),
+            );
+          }
+          assert(false, 'Need to implement ${settings.name}');
+          return null;
         },
       ),
     );

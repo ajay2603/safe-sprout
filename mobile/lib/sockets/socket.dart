@@ -1,5 +1,5 @@
 import "package:socket_io_client/socket_io_client.dart" as IO;
-import 'consts.dart';
+import '../global/consts.dart';
 import '../utilities/secure_storage.dart';
 
 IO.Socket? socket;
