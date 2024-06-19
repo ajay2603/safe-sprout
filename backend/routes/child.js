@@ -82,6 +82,38 @@ router.post("/new-child", async (req, res) => {
   }
 });
 
+router.post("/gen/child-id", (req, res) => {
+  const token = req.headers.authorization;
+  const childID = req.body.id;
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    if (payload) {
+      User.findOne({ email: payload.email })
+        .then((usr) => {
+          if (usr) {
+            if (usr.children.includes(childID)) {
+              const token = jwt.sign(
+                { id: childID, type: "child" },
+                process.env.JWT_SECRET
+              );
+              res
+                .status(200)
+                .json({ message: "token created success", token: token });
+            } else res.status(404).json({ message: "child not found" });
+          } else {
+            res.status(401).json({ message: "user not authorized" });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ message: "Internal Server error" });
+        });
+    } else res.status(401).json({ message: "user not authorized" });
+  } catch (err) {
+    res.status(401).json({ message: "user not authorized" });
+  }
+});
+
 router.get("/info", async (req, res) => {
   const token = req.headers.authorization;
   const { id } = req.query;

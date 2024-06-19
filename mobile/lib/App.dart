@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile/providers/LocationProvider.dart';
 import 'package:mobile/screens/ChildInfo.dart';
 import 'package:mobile/screens/Home.dart';
+import 'package:mobile/utilities/childlocation.dart';
 import 'package:provider/provider.dart';
 import './screens/Validation.dart';
 import './screens/Auth.dart';
@@ -21,6 +22,8 @@ class MyApp extends StatelessWidget {
             Colors.transparent, // Change this to match your AppBar color
       ),
     );
+
+    //startBackgroundService();
 
     return MultiProvider(
       providers: [

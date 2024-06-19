@@ -19,3 +19,8 @@ void socketInit() async {
     print("socket disconnected 1");
   });
 }
+
+void diconnectSocket() async {
+  socket?.disconnect();
+  socket = null;
+}

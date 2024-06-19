@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mobile/global/consts.dart';
 import 'package:mobile/providers/ChildrenListProvider.dart';
+import 'package:mobile/utilities/childlocation.dart';
 import 'package:mobile/utilities/dialogs.dart';
 import 'package:mobile/utilities/permisions.dart';
 import 'package:mobile/utilities/secure_storage.dart';
@@ -36,7 +37,26 @@ class _Child extends State<ChildInfo> {
     }
   }
 
-  void validate() {
+  Future<String> getChildToken() async {
+    String token = await getKey("token") ?? "";
+    try {
+      var response = await http.Client().post(
+          Uri.parse("${serverURL}/child/gen/child-id"),
+          body: {"id": widget.child.id},
+          headers: {"Authorization": token});
+      var result = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return result['token'];
+      } else {
+        throw Exception(result['message']);
+      }
+    } catch (err) {
+      print(err);
+      throw Exception("Network Error");
+    }
+  }
+
+  void validate() async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -61,8 +81,15 @@ class _Child extends State<ChildInfo> {
                 validateSession();
                 bool permision = await requestLocationPermisionChild(context);
                 if (permision) {
-                  
-                  //TrackChild();
+                  try {
+                    var token = await getChildToken();
+                    alertDialog("Token", token, context);
+                    setKey("token", token);
+                    startBackgroundService();
+                  } catch (err) {
+                    retryDialog(
+                        "Error", err.toString(), context, getChildToken);
+                  }
                 } else {
                   alertDialog("Error",
                       "Unable to access the Location all the time", context);
