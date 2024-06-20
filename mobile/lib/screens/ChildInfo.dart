@@ -20,7 +20,7 @@ class ChildInfo extends StatefulWidget {
 }
 
 class _Child extends State<ChildInfo> {
-  void validateSession() async {
+  Future<bool> validateSession() async {
     String token = await getKey("token") ?? "";
     try {
       var response = await http.Client().post(
@@ -31,9 +31,13 @@ class _Child extends State<ChildInfo> {
       if (response.statusCode != 200) {
         var result = jsonDecode(response.body);
         alertDialog("Error", result['message'], context);
-      }
+        return false;
+      } else
+        return true;
     } catch (err) {
       print(err);
+      retryDialog("Error", "Network Error", context, validateSession);
+      return false;
     }
   }
 
@@ -56,7 +60,15 @@ class _Child extends State<ChildInfo> {
     }
   }
 
-  void validate() async {
+  void goToTracking() {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/tracking',
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  void validate(BuildContext pageContext) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -78,23 +90,29 @@ class _Child extends State<ChildInfo> {
             TextButton(
               child: Text('Continue'),
               onPressed: () async {
-                validateSession();
-                bool permision = await requestLocationPermisionChild(context);
-                if (permision) {
-                  try {
-                    var token = await getChildToken();
-                    alertDialog("Token", token, context);
-                    setKey("token", token);
-                    startBackgroundService();
-                  } catch (err) {
-                    retryDialog(
-                        "Error", err.toString(), context, getChildToken);
+                var auth = await validateSession();
+                if (auth) {
+                  bool permision = await requestLocationPermisionChild(context);
+                  if (permision) {
+                    try {
+                      var token = await getChildToken();
+                      alertDialog("Token", token, context);
+                      setKey("token", token);
+                      startBackgroundService();
+                      goToTracking();
+                      Navigator.of(context).pop();
+                      goToTracking();
+                    } catch (err) {
+                      retryDialog(
+                          "Error", err.toString(), context, getChildToken);
+                    }
+                  } else {
+                    alertDialog("Error",
+                        "Unable to access the Location all the time", context);
                   }
                 } else {
-                  alertDialog("Error",
-                      "Unable to access the Location all the time", context);
+                  Navigator.of(context).pop();
                 }
-                //Navigator.of(context).pop();
               },
             ),
           ],
@@ -149,7 +167,7 @@ class _Child extends State<ChildInfo> {
               ),
             ),
             ElevatedButton(
-              onPressed: () => {validate()},
+              onPressed: () => {validate(context)},
               child: Text("Track this device"),
             ),
           ],

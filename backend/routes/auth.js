@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../database/user_model");
+const Child = require("../database/child_model");
 
 router.post("/register", async (req, res) => {
   const { email, name, password } = req.body;
@@ -72,19 +73,28 @@ router.post("/validate-token", (req, res) => {
   const token = req.headers.authorization;
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(payload);
     if (payload) {
-      User.findOne({ email: payload.email })
-        .then((usr) => {
-          if (usr) {
-            res.status(200).json({ message: "user authorized" });
-          } else {
-            res.status(401).json({ message: "user not authorized" });
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          res.status(500).json({ message: "Internal Server error" });
-        });
+      if (payload.type == "parent") {
+        User.findOne({ email: payload.email })
+          .then((usr) => {
+            if (usr) {
+              res
+                .status(200)
+                .json({ message: "user authorized", type: payload.type });
+            } else {
+              res.status(401).json({ message: "user not authorized" });
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            res.status(500).json({ message: "Internal Server error" });
+          });
+      } else if (payload.type == "child") {
+        res
+          .status(200)
+          .json({ message: "user authorized", type: payload.type });
+      } else res.status(401).json({ message: "user not authorized" });
     } else res.status(401).json({ message: "user not authorized" });
   } catch (err) {
     res.status(401).json({ message: "user not authorized" });
@@ -108,6 +118,53 @@ router.post("/validate-pass", (req, res) => {
             else res.status(401).json({ message: "Incorrect Password" });
           } else {
             res.status(401).json({ message: "user not authorized" });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ message: "Internal Server error" });
+        });
+    } else res.status(401).json({ message: "user not authorized" });
+  } catch (err) {
+    res.status(401).json({ message: "user not authorized" });
+  }
+});
+
+router.post("/gen/token", (req, res) => {
+  const token = req.headers.authorization;
+  const pass = req.body.password;
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    if (payload) {
+      Child.findOne({ _id: payload.id })
+        .then((ch) => {
+          console.log(ch);
+          if (ch) {
+            User.findOne({ _id: ch.parent })
+              .then((usr) => {
+                if (usr) {
+                  if (pass == usr.password) {
+                    console.log("invalid password");
+                    res.status(401).json({ message: "user not authorized" });
+                    return;
+                  }
+                  const token = jwt.sign(
+                    { email: usr.email, id: usr._id, type: "parent" },
+                    process.env.JWT_SECRET
+                  );
+                  res
+                    .status(200)
+                    .json({ message: "token created success", token: token });
+                } else res.status(401).json({ message: "user not authorized" });
+              })
+              .catch((err) => {
+                console.error(err);
+                res
+                  .json(500)
+                  .json({ message: "Error in fetching data try again" });
+              });
+          } else {
+            res.status(404).json({ message: "child not found" });
           }
         })
         .catch((err) => {

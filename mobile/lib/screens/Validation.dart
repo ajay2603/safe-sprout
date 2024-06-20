@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../global/consts.dart';
@@ -18,6 +20,8 @@ class _ValidationState extends State<Validation> {
 
   Future<void> validateSession() async {
     print("Called");
+    String token = await getKey("token") ?? "";
+    print(token);
     try {
       String token = await getKey("token") ?? "";
       var response = await http.Client().post(
@@ -25,18 +29,19 @@ class _ValidationState extends State<Validation> {
           headers: {"Authorization": token});
       print(response.body);
       if (response.statusCode == 200) {
-        String type = await getKey('type') ?? "";
-        switch (type) {
+        var result = jsonDecode(response.body);
+        switch (result['type']) {
           case "parent":
             Navigator.pushReplacementNamed(context, "/home");
             break;
           case "child":
-            Navigator.pushReplacementNamed(context, "/add-child");
+            Navigator.pushReplacementNamed(context, "/tracking");
             break;
           default:
             Navigator.pushReplacementNamed(context, "/auth");
         }
       } else {
+        print("unauthorised");
         Navigator.pushReplacementNamed(context, '/auth');
       }
     } catch (error) {

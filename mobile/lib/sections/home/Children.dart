@@ -28,11 +28,15 @@ class _Children extends State<Children> {
         Uri.parse("$serverURL/child/all"),
         headers: {"Authorization": token},
       );
+      var result = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
+        
 
         Provider.of<ChildrenListProvider>(context, listen: false)
             .setChildList(result['children']);
+      }
+      else{
+        alertDialog("Error", result['message'], context);
       }
     } catch (err) {
       print(err);

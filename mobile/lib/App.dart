@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile/providers/LocationProvider.dart';
 import 'package:mobile/screens/ChildInfo.dart';
 import 'package:mobile/screens/Home.dart';
+import 'package:mobile/screens/Tracking.dart';
 import 'package:mobile/utilities/childlocation.dart';
 import 'package:provider/provider.dart';
 import './screens/Validation.dart';
@@ -36,13 +37,14 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: "My First App",
-        theme: ThemeData(primarySwatch: Colors.blue),
+        theme: ThemeData(primaryColor: Colors.blue),
         initialRoute: "/",
         routes: {
           "/": (context) => const Validation(),
           "/auth": (context) => Auth(),
           "/home": (context) => Home(),
           "/add-child": (context) => NewChild(),
+          "/tracking": (context) => Tracking()
         },
         onGenerateRoute: (settings) {
           if (settings.name == '/child') {

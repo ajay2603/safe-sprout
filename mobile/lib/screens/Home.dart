@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/sockets/socket.dart';
 import 'package:mobile/utilities/background-location.dart';
+import 'package:mobile/utilities/childlocation.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 import "../sections/home/Map.dart";
 import '../utilities/secure_storage.dart';
@@ -42,6 +43,7 @@ class _Home extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    stopBackgroundService();
     getCurrentLocationStream(context);
 
     return Scaffold(
@@ -53,7 +55,7 @@ class _Home extends State<Home> {
               onPressed: () async {
                 await removeKey("token");
                 await removeKey("type");
-                socket?.disconnect();
+                diconnectSocket();
                 Navigator.pushReplacementNamed(context, "/");
               },
               icon: Icon(Icons.logout_rounded),
