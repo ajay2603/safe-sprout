@@ -24,6 +24,13 @@ class _Home extends State<Home> {
     socketEvents();
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    stopBackgroundService();
+  }
+
   void socketEvents() {
     socket;
     socket?.onConnect((data) => print("connected"));
