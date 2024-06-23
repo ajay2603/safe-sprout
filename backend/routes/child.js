@@ -6,13 +6,10 @@ const Child = require("../database/child_model");
 const User = require("../database/user_model");
 
 router.get("/all", async (req, res) => {
-  console.log("called");
-
   const token = req.headers.authorization;
   try {
     try {
       var decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(decoded);
     } catch (err) {
       console.error(err);
       res.status(401).json({ message: "user not autunticated" });
@@ -21,7 +18,6 @@ router.get("/all", async (req, res) => {
 
     const _id = decoded.id;
     const usr = await User.findOne({ _id });
-    console.log(usr);
     if (!usr) {
       res.status(404).json({ message: "user not found" });
       return;
@@ -142,7 +138,7 @@ router.get("/info", async (req, res) => {
       res.status(401).json({ message: "user not authorized" });
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 });

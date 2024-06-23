@@ -2,59 +2,86 @@ import 'dart:async';
 
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mobile/sockets/socket.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:connectivity/connectivity.dart';
 import 'package:mobile/global/consts.dart';
 import 'package:mobile/utilities/secure_storage.dart';
 
-void startBackgroundService() {
+Future<void> startChildBackgroundService() async {
+  await initializeChildService();
   final service = FlutterBackgroundService();
   service.startService();
 }
 
-void stopBackgroundService() {
+Future<void> stopBackgroundService() async {
   final service = FlutterBackgroundService();
   service.invoke("stop");
+  socketInit();
 }
 
-Future<void> initializeService() async {
+Future<void> startParentBackgroundService() async {
+  await initializeParentService();
+  final service = FlutterBackgroundService();
+  service.startService();
+}
+
+Future<void> initializeParentService() async {
   final service = FlutterBackgroundService();
 
   await service.configure(
     iosConfiguration: IosConfiguration(
       autoStart: true,
-      onForeground: onStart,
+      onForeground: onChildStart,
       onBackground: onIosBackground,
     ),
     androidConfiguration: AndroidConfiguration(
       autoStart: true,
-      onStart: onStart,
-      isForegroundMode: true, // Set to true for foreground service
-      autoStartOnBoot: true,
+      onStart: onParentStart,
+      isForegroundMode: false, // Set to true for foreground service
+      autoStartOnBoot: false,
     ),
   );
 }
 
+Future<void> initializeChildService() async {
+  final service = FlutterBackgroundService();
 
+  await service.configure(
+    iosConfiguration: IosConfiguration(
+      autoStart: true,
+      onForeground: onChildStart,
+      onBackground: onIosBackground,
+    ),
+    androidConfiguration: AndroidConfiguration(
+      autoStart: true,
+      onStart: onChildStart,
+      isForegroundMode: true, // Set to true for foreground service
+      autoStartOnBoot: false,
+    ),
+  );
+}
 
 @pragma('vm:entry-point')
-void onStart(ServiceInstance service) async {
-  final socket = io.io(serverURL, {
-    'transports': ['websocket'],
-    'extraHeaders': {'Authorization': getKey('token')},
+void onParentStart(ServiceInstance service) async {
+  socketInit();
+
+  socket?.on("event-name", (data) {
+    // Handle events from the server
+    print("Received event: $data");
   });
 
-  socket.onConnect((_) {
-    print('Connected. Socket ID: ${socket.id}');
+  service.on("stop").listen((event) {
+    service.stopSelf();
+    print("Background process stopped");
   });
+}
 
-  socket.onDisconnect((_) {
-    print('Disconnected');
-    // Reconnect logic
-    _reconnectSocket(socket);
-  });
+@pragma('vm:entry-point')
+void onChildStart(ServiceInstance service) async {
+  socketInit();
 
-  socket.on("event-name", (data) {
+  socket?.on("event-name", (data) {
     // Handle events from the server
     print("Received event: $data");
   });
@@ -65,19 +92,21 @@ void onStart(ServiceInstance service) async {
   });
 
   // Start geolocation updates
-  _startLocationUpdates(socket);
+  _startLocationUpdates();
 }
 
-void _reconnectSocket(io.Socket socket) {
+void _reconnectSocket() {
   // Implement your socket reconnection logic here
   print('Attempting to reconnect...');
-  socket.connect(); // Example: Attempt to reconnect immediately
+  io.Socket? socket = getSocket();
+  socket?.connect(); // Example: Attempt to reconnect immediately
 }
 
-void _startLocationUpdates(io.Socket socket) {
+void _startLocationUpdates() {
   Geolocator.getPositionStream().listen((position) {
     print(position);
-    socket.emit("location", {
+    io.Socket? socket = getSocket();
+    socket?.emit("location", {
       "latitude": position.latitude,
       "longitude": position.longitude,
     });

@@ -73,7 +73,6 @@ router.post("/validate-token", (req, res) => {
   const token = req.headers.authorization;
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(payload);
     if (payload) {
       if (payload.type == "parent") {
         User.findOne({ email: payload.email })
@@ -104,8 +103,6 @@ router.post("/validate-token", (req, res) => {
 router.post("/validate-pass", (req, res) => {
   const token = req.headers.authorization;
   const password = req.body.password;
-
-  console.log(password);
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
@@ -138,13 +135,11 @@ router.post("/gen/token", (req, res) => {
     if (payload) {
       Child.findOne({ _id: payload.id })
         .then((ch) => {
-          console.log(ch);
           if (ch) {
             User.findOne({ _id: ch.parent })
               .then((usr) => {
                 if (usr) {
                   if (pass == usr.password) {
-                    console.log("invalid password");
                     res.status(401).json({ message: "user not authorized" });
                     return;
                   }

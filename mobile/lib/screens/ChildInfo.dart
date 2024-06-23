@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mobile/global/consts.dart';
 import 'package:mobile/providers/ChildrenListProvider.dart';
+import 'package:mobile/sockets/socket.dart';
 import 'package:mobile/utilities/childlocation.dart';
 import 'package:mobile/utilities/dialogs.dart';
 import 'package:mobile/utilities/permisions.dart';
@@ -97,9 +98,11 @@ class _Child extends State<ChildInfo> {
                     try {
                       var token = await getChildToken();
                       alertDialog("Token", token, context);
-                      setKey("token", token);
-                      startBackgroundService();
-                      goToTracking();
+                      disconnectSocket();
+                      stopBackgroundService();
+                      await setKey("token", token);
+                      await setKey("type", "child");
+                      startChildBackgroundService();
                       Navigator.of(context).pop();
                       goToTracking();
                     } catch (err) {

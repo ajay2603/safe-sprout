@@ -2,6 +2,7 @@ import "dart:convert";
 
 import "package:flutter/material.dart";
 import "package:mobile/global/consts.dart";
+import "package:mobile/sockets/socket.dart";
 import "package:mobile/utilities/childlocation.dart";
 import "package:mobile/utilities/dialogs.dart";
 import "package:mobile/utilities/secure_storage.dart";
@@ -45,11 +46,13 @@ class _Tracking extends State<Tracking> {
                 child: Text('Continue'),
                 onPressed: () async {
                   try {
+                    disconnectSocket();
+                    stopBackgroundService();
                     String token = await getParentToken();
                     alertDialog("token", token, context);
-                    setKey("token", token);
-                    setKey("type", "parent");
-                    stopBackgroundService();
+                    await setKey("token", token);
+                    await setKey("type", "parent");
+                    startParentBackgroundService();
                     goToHome();
                   } catch (err) {
                     alertDialog("Error", err.toString(), context);

@@ -20,21 +20,11 @@ class Home extends StatefulWidget {
 class _Home extends State<Home> {
   int _selectedIndex = 0;
 
-  _Home() {
-    socketEvents();
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    stopBackgroundService();
-  }
-
-  void socketEvents() {
-    socket;
-    socket?.onConnect((data) => print("connected"));
-    socket?.onDisconnect((data) => print("disconnect"));
+    startParentBackgroundService();
   }
 
   void _onItemTapped(int index) {
@@ -50,9 +40,7 @@ class _Home extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    stopBackgroundService();
     getCurrentLocationStream(context);
-
     return Scaffold(
         appBar: AppBar(
           title: const Text('SafeSprout'),
@@ -62,7 +50,7 @@ class _Home extends State<Home> {
               onPressed: () async {
                 await removeKey("token");
                 await removeKey("type");
-                diconnectSocket();
+                disconnectSocket();
                 Navigator.pushReplacementNamed(context, "/");
               },
               icon: Icon(Icons.logout_rounded),
