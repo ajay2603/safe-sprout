@@ -31,7 +31,6 @@ const childSchema = mongoose.Schema({
     {
       date: {
         type: Date,
-        default: Date.now,
       },
       locations: [
         {

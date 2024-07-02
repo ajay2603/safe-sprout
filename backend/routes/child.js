@@ -88,12 +88,16 @@ router.post("/gen/child-id", (req, res) => {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     if (payload) {
       User.findOne({ email: payload.email })
-        .then((usr) => {
+        .then(async (usr) => {
           if (usr) {
             if (usr.children.includes(childID)) {
               const token = jwt.sign(
                 { id: childID, type: "child" },
                 process.env.JWT_SECRET
+              );
+              await Child.findOneAndUpdate(
+                { _id: childID },
+                { $set: { tracking: true } }
               );
               res
                 .status(200)

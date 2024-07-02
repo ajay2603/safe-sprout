@@ -1,12 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mobile/sockets/socket.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
-import 'package:connectivity/connectivity.dart';
-import 'package:mobile/global/consts.dart';
-import 'package:mobile/utilities/secure_storage.dart';
 
 Future<void> startChildBackgroundService() async {
   await initializeChildService();
@@ -36,7 +32,7 @@ Future<void> initializeParentService() async {
       onBackground: onIosBackground,
     ),
     androidConfiguration: AndroidConfiguration(
-      autoStart: true,
+      autoStart: false,
       onStart: onParentStart,
       isForegroundMode: false, // Set to true for foreground service
       autoStartOnBoot: false,
@@ -65,11 +61,6 @@ Future<void> initializeChildService() async {
 @pragma('vm:entry-point')
 void onParentStart(ServiceInstance service) async {
   socketInit();
-
-  socket?.on("event-name", (data) {
-    // Handle events from the server
-    print("Received event: $data");
-  });
 
   service.on("stop").listen((event) {
     service.stopSelf();

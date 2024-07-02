@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:mobile/sockets/sockethandler.dart';
 import "package:socket_io_client/socket_io_client.dart" as IO;
 import '../global/consts.dart';
 import '../utilities/secure_storage.dart';
@@ -19,6 +18,8 @@ void socketInit() async {
   socket?.on("event", (_) {
     print(_);
   });
+
+  if (await getKey("type") == "parent") socketHandlers(socket);
 
   socket?.onConnect((data) {
     print("socket connected 1");

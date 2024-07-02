@@ -1,4 +1,3 @@
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
@@ -26,7 +25,6 @@ class ChildrenListProvider extends ChangeNotifier {
   Map childrenMap = {};
 
   void setChildList(List list) {
-
     list.forEach((child) {
       childrenMap[child['_id']] = Child(
           id: child['_id'],
@@ -40,6 +38,19 @@ class ChildrenListProvider extends ChangeNotifier {
 
     childrenList = childrenMap.keys.toList();
 
+    notifyListeners();
+  }
+
+  void updateChild(data) {
+    print("called provider");
+    if (childrenMap.containsKey(data['_id'])) {
+      childrenMap[data['_id']].currentLocation = LatLng(
+          data['lastLocation']['latitude'].toDouble(),
+          data['lastLocation']['longitude'].toDouble());
+      childrenMap[data['_id']].safe = data['safe'];
+      childrenMap[data['_id']].tracking = data['tracking'];
+      childrenMap[data['_id']].live = data['live'];
+    }
     notifyListeners();
   }
 

@@ -2,17 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:mobile/sockets/socket.dart';
 import 'package:mobile/utilities/background-location.dart';
 import 'package:mobile/utilities/childlocation.dart';
-import 'package:socket_io_client/socket_io_client.dart';
 import "../sections/home/Map.dart";
 import '../utilities/secure_storage.dart';
 import '../sections/home/Children.dart';
 
-import '../providers/ChildrenListProvider.dart';
-
 class Home extends StatefulWidget {
-  Home({super.key}) {
-    socketInit();
-  }
   @override
   _Home createState() => _Home();
 }

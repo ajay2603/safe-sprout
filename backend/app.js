@@ -10,6 +10,14 @@ mongoose.connect(
   "mongodb://127.0.0.1:27017/safeSproutDB?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1"
 );
 
+const clearSocketData = require("./utilities/clearsocketdata");
+
+const clear = async () => {
+  await clearSocketData();
+};
+
+clear();
+
 const userAuthRoutes = require("./routes/auth");
 app.use("/user/auth", userAuthRoutes);
 

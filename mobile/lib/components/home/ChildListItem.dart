@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:mobile/utilities/status.dart';
 import 'package:provider/provider.dart';
 import '../../providers/ChildrenListProvider.dart';
@@ -12,7 +11,7 @@ class ChildListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onLongPress: () =>
+      onTap: () =>
           Navigator.pushNamed(context, "/child", arguments: child),
       child: Consumer<ChildrenListProvider>(
         builder: (context, provider, _) {

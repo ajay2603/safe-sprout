@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const childSocket = require("./childsocket");
 const parentSocket = require("./parentSocket");
+const Child = require("../database/child_model");
 let IO;
 let socket;
 
@@ -40,9 +41,9 @@ const initIO = (IO) => {
     try {
       const paylode = getPayLode(socket.handshake.headers.authorization);
       if (paylode.type == "child") {
-        childSocket(socket, paylode);
+        childSocket(socket, paylode, IO);
       } else if (paylode.type == "parent") {
-        parentSocket(socket, paylode);
+        parentSocket(socket, paylode, IO);
       } else {
         console.log(paylode);
       }
@@ -54,10 +55,6 @@ const initIO = (IO) => {
     setInterval(() => {
       socket.emit("event", "listned event ");
     }, 1000);
-
-    socket.on("location", (data) => {
-      console.log(data);
-    });
   });
 };
 
