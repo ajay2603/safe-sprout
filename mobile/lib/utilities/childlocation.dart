@@ -13,7 +13,7 @@ Future<void> startChildBackgroundService() async {
 Future<void> stopBackgroundService() async {
   final service = FlutterBackgroundService();
   service.invoke("stop");
-  socketInit();
+  socketInit(service as ServiceInstance);
 }
 
 Future<void> startParentBackgroundService() async {
@@ -60,7 +60,7 @@ Future<void> initializeChildService() async {
 
 @pragma('vm:entry-point')
 void onParentStart(ServiceInstance service) async {
-  socketInit();
+  socketInit(service);
 
   service.on("stop").listen((event) {
     service.stopSelf();
@@ -70,7 +70,7 @@ void onParentStart(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 void onChildStart(ServiceInstance service) async {
-  socketInit();
+  socketInit(service);
 
   socket?.on("event-name", (data) {
     // Handle events from the server

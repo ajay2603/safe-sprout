@@ -13,8 +13,38 @@ import './screens/NewChild.dart';
 
 import './providers/ChildrenListProvider.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
+
+
+  void handleEvents(BuildContext context) async {
+    FlutterBackgroundService service = FlutterBackgroundService();
+
+    // Check if the service is running
+    bool isRunning = await service.isRunning();
+
+    // If the service is running, stop it
+    if (isRunning) {
+      service.invoke("stop");
+    }
+
+    // Start a new instance of the service
+    await service.startService();
+
+    // Set up listeners for the new service instance
+    service.on("demo").listen((event) {
+      print(event);
+    });
+
+    service.on("updateChild").listen((event) {
+      print("2222");
+      if (event != null) {
+        print(event);
+        Provider.of<ChildrenListProvider>(context, listen: false)
+            .updateChild(event['data']);
+      }
+    });
+  }
 
   @override
   void dispose() async {
@@ -28,6 +58,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    handleEvents(context);
+
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor:
@@ -37,37 +69,27 @@ class MyApp extends StatelessWidget {
 
     //startBackgroundService();
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => ChildrenListProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => LocationProvider(),
-        ),
-      ],
-      child: MaterialApp(
-        title: "My First App",
-        theme: ThemeData(primaryColor: Colors.blue),
-        initialRoute: "/",
-        routes: {
-          "/": (context) => const Validation(),
-          "/auth": (context) => Auth(),
-          "/home": (context) => Home(),
-          "/add-child": (context) => NewChild(),
-          "/tracking": (context) => Tracking()
-        },
-        onGenerateRoute: (settings) {
-          if (settings.name == '/child') {
-            final Child child = settings.arguments as Child;
-            return MaterialPageRoute(
-              builder: (context) => ChildInfo(child: child),
-            );
-          }
-          assert(false, 'Need to implement ${settings.name}');
-          return null;
-        },
-      ),
+    return MaterialApp(
+      title: "My First App",
+      theme: ThemeData(primaryColor: Colors.blue),
+      initialRoute: "/",
+      routes: {
+        "/": (context) => const Validation(),
+        "/auth": (context) => Auth(),
+        "/home": (context) => Home(),
+        "/add-child": (context) => NewChild(),
+        "/tracking": (context) => Tracking()
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/child') {
+          final Child child = settings.arguments as Child;
+          return MaterialPageRoute(
+            builder: (context) => ChildInfo(child: child),
+          );
+        }
+        assert(false, 'Need to implement ${settings.name}');
+        return null;
+      },
     );
   }
 }

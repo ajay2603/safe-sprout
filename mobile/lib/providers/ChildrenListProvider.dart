@@ -42,7 +42,6 @@ class ChildrenListProvider extends ChangeNotifier {
   }
 
   void updateChild(data) {
-    print("called provider");
     if (childrenMap.containsKey(data['_id'])) {
       childrenMap[data['_id']].currentLocation = LatLng(
           data['lastLocation']['latitude'].toDouble(),
