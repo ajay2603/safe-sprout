@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -5,6 +7,7 @@ import 'package:mobile/providers/LocationProvider.dart';
 import 'package:mobile/screens/ChildInfo.dart';
 import 'package:mobile/screens/Home.dart';
 import 'package:mobile/screens/Tracking.dart';
+import 'package:mobile/utilities/childlocation.dart';
 import 'package:mobile/utilities/secure_storage.dart';
 import 'package:provider/provider.dart';
 import './screens/Validation.dart';
@@ -15,7 +18,6 @@ import './providers/ChildrenListProvider.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
-
 
   void handleEvents(BuildContext context) async {
     FlutterBackgroundService service = FlutterBackgroundService();
@@ -37,23 +39,21 @@ class App extends StatelessWidget {
     });
 
     service.on("updateChild").listen((event) {
-      print("2222");
       if (event != null) {
         print(event);
         Provider.of<ChildrenListProvider>(context, listen: false)
             .updateChild(event['data']);
       }
     });
-  }
 
-  @override
-  void dispose() async {
-    WidgetsBinding.instance.removeObserver(this as WidgetsBindingObserver);
-    var service = FlutterBackgroundService();
-    var type = await getKey("type");
-    if (type == "parent") {
-      service.invoke("stop");
-    }
+    service.on("upDateTracking").listen((event) {
+      print(event);
+      print("blab blab");
+      if (event != null) {
+        Provider.of<ChildrenListProvider>(context, listen: false)
+            .updateTracking(event['data']);
+      }
+    });
   }
 
   @override

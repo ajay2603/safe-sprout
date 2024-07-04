@@ -12,8 +12,8 @@ Future<void> startChildBackgroundService() async {
 
 Future<void> stopBackgroundService() async {
   final service = FlutterBackgroundService();
+  service.invoke("stopSocket");
   service.invoke("stop");
-  socketInit(service as ServiceInstance);
 }
 
 Future<void> startParentBackgroundService() async {
@@ -32,9 +32,9 @@ Future<void> initializeParentService() async {
       onBackground: onIosBackground,
     ),
     androidConfiguration: AndroidConfiguration(
-      autoStart: false,
+      autoStart: true,
       onStart: onParentStart,
-      isForegroundMode: false, // Set to true for foreground service
+      isForegroundMode: true, // Set to true for foreground service
       autoStartOnBoot: false,
     ),
   );
@@ -52,8 +52,8 @@ Future<void> initializeChildService() async {
     androidConfiguration: AndroidConfiguration(
       autoStart: true,
       onStart: onChildStart,
-      isForegroundMode: true, // Set to true for foreground service
-      autoStartOnBoot: false,
+      isForegroundMode: false, // Set to true for foreground service
+      autoStartOnBoot: true,
     ),
   );
 }

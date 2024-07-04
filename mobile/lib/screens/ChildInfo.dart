@@ -57,7 +57,7 @@ class _Child extends State<ChildInfo> {
       }
     } catch (err) {
       print(err);
-      throw Exception("Network Error");
+      throw Exception(err.toString());
     }
   }
 

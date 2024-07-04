@@ -6,6 +6,10 @@ const jwt = require("jsonwebtoken");
 const User = require("../database/user_model");
 const Child = require("../database/child_model");
 
+const { getIO } = require("../sockets/socket");
+
+const { ParentSocketMap } = require("../database/socket_map");
+
 router.post("/register", async (req, res) => {
   const { email, name, password } = req.body;
 
@@ -137,7 +141,7 @@ router.post("/gen/token", (req, res) => {
         .then((ch) => {
           if (ch) {
             User.findOne({ _id: ch.parent })
-              .then((usr) => {
+              .then(async (usr) => {
                 if (usr) {
                   if (pass == usr.password) {
                     res.status(401).json({ message: "user not authorized" });
@@ -147,6 +151,22 @@ router.post("/gen/token", (req, res) => {
                     { email: usr.email, id: usr._id, type: "parent" },
                     process.env.JWT_SECRET
                   );
+                  ch.tracking = false;
+                  await ch.save().then(() => {
+                    const IO = getIO();
+                    if (IO) {
+                      ParentSocketMap.findOne({ parentID: usr._id }).then(
+                        (par) => {
+                          par.socketIDS.forEach((sid) => {
+                            IO.to(sid).emit("upDateTracking", {
+                              tracking: false,
+                              id: ch._id,
+                            });
+                          });
+                        }
+                      );
+                    }
+                  });
                   res
                     .status(200)
                     .json({ message: "token created success", token: token });

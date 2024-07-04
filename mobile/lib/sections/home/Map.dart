@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/providers/ChildrenListProvider.dart';
 import 'package:mobile/providers/LocationProvider.dart';
 import 'package:mobile/utilities/dialogs.dart';
+import 'package:mobile/utilities/status.dart';
 import '../../utilities/secure_storage.dart';
 import '../../global/consts.dart';
 import 'package:provider/provider.dart';
@@ -97,7 +99,8 @@ class _Map extends State<Map> {
   Widget build(BuildContext context) {
     LatLng _currentLocation = context.watch<LocationProvider>().currentLocation;
     bool currentDisp = context.watch<LocationProvider>().currentDisp;
-
+    ChildrenListProvider childListProvider =
+        Provider.of<ChildrenListProvider>(context, listen: true);
     return Stack(
       children: [
         FlutterMap(
@@ -188,6 +191,38 @@ class _Map extends State<Map> {
                         )
                       ]
                     : [],
+                ...childListProvider.childrenMap.keys.map((id) {
+                  if (id != null) {
+                    return (Marker(
+                      width: (childListProvider.childrenMap[id].tracking)
+                          ? 150
+                          : 0,
+                      height: (childListProvider.childrenMap[id].tracking)
+                          ? 150
+                          : 0,
+                      point: childListProvider.childrenMap[id].currentLocation,
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.person_pin_circle,
+                            size: 50,
+                            color: Colors.green,
+                          ),
+                          Text(
+                            childListProvider.childrenMap[id].name,
+                            style: TextStyle(fontSize: 20),
+                          )
+                        ],
+                      ),
+                    ));
+                  } else {
+                    return Marker(
+                        width: 0,
+                        height: 0,
+                        point: LatLng(0, 0),
+                        child: SizedBox());
+                  }
+                }),
               ],
             ),
           ],
@@ -229,6 +264,49 @@ class _Map extends State<Map> {
             ],
           ),
         ),
+        Positioned(
+          top: 10,
+          left: 0,
+          child: SingleChildScrollView(
+            child: Row(
+              children: [
+                ...childListProvider.childrenMap.keys.map((id) {
+                  return ((childListProvider.childrenMap[id].tracking)
+                      ? GestureDetector(
+                          onTap: () {
+                            _mapController.move(
+                                childListProvider
+                                    .childrenMap[id].currentLocation,
+                                18.8);
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(right: 15),
+                            decoration: BoxDecoration(
+                                color: setBgColor(
+                                    true,
+                                    childListProvider.childrenMap[id].live,
+                                    childListProvider.childrenMap[id].safe),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                child: Text(
+                                  childListProvider.childrenMap[id].name,
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600),
+                                )),
+                          ),
+                        )
+                      : SizedBox(
+                          height: 0,
+                          width: 0,
+                        ));
+                })
+              ],
+            ),
+          ),
+        )
       ],
     );
   }

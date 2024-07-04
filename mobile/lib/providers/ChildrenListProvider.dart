@@ -70,4 +70,11 @@ class ChildrenListProvider extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  void updateTracking(data) {
+    if (childrenMap.containsKey(data['id'])) {
+      childrenMap[data['id']].tracking = data['tracking'];
+    }
+    notifyListeners();
+  }
 }

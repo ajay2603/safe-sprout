@@ -5,6 +5,10 @@ const jwt = require("jsonwebtoken");
 const Child = require("../database/child_model");
 const User = require("../database/user_model");
 
+const { getIO } = require("../sockets/socket");
+
+const { ParentSocketMap } = require("../database/socket_map");
+
 router.get("/all", async (req, res) => {
   const token = req.headers.authorization;
   try {
@@ -95,10 +99,36 @@ router.post("/gen/child-id", (req, res) => {
                 { id: childID, type: "child" },
                 process.env.JWT_SECRET
               );
-              await Child.findOneAndUpdate(
-                { _id: childID },
-                { $set: { tracking: true } }
-              );
+
+              const chh = await Child.findOne({ _id: childID });
+              if (chh) {
+                if (chh.tracking == true) {
+                  res.status(409).json({
+                    message: "This child is being tracked by other device",
+                  });
+                  return;
+                }
+
+                chh.tracking = true;
+                chh.save().then(() => {
+                  const IO = getIO();
+                  if (IO) {
+                    ParentSocketMap.findOne({ parentID: usr._id }).then(
+                      (par) => {
+                        if (par) {
+                          par.socketIDS.forEach((sid) => {
+                            IO.to(sid).emit("upDateTracking", {
+                              tracking: true,
+                              id: childID,
+                            });
+                          });
+                        }
+                      }
+                    );
+                  }
+                });
+              }
+
               res
                 .status(200)
                 .json({ message: "token created success", token: token });

@@ -20,6 +20,10 @@ void socketInit(ServiceInstance service) async {
     service.invoke("demo", {"data": _});
   });
 
+  service.on("stopSocket").listen((_) {
+    socket?.disconnect();
+  });
+
   if (await getKey("type") == "parent") socketHandlers(socket, service);
 
   socket?.onConnect((data) {
