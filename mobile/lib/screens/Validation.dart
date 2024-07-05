@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../global/consts.dart';
 import '../utilities/secure_storage.dart';
 import '../utilities/dialogs.dart';
+import "../global/type.dart";
 
 class Validation extends StatefulWidget {
   const Validation({Key? key});
@@ -21,6 +22,7 @@ class _ValidationState extends State<Validation> {
   Future<void> validateSession() async {
     print("Called");
     String token = await getKey("token") ?? "";
+    Type.setType(await getKey("type") ?? "");
     print(token);
     try {
       String token = await getKey("token") ?? "";
@@ -30,6 +32,7 @@ class _ValidationState extends State<Validation> {
       print(response.body);
       if (response.statusCode == 200) {
         var result = jsonDecode(response.body);
+        Type.setType(result['type']);
         switch (result['type']) {
           case "parent":
             Navigator.pushReplacementNamed(context, "/home");

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile/providers/ChildrenListProvider.dart';
 import 'package:mobile/providers/LocationProvider.dart';
 import 'package:mobile/utilities/childlocation.dart';
+import 'package:mobile/utilities/secure_storage.dart';
+import './global/type.dart';
 import 'package:provider/provider.dart';
 import 'App.dart';
 
@@ -29,9 +31,10 @@ class _MyApp extends State<MyApp> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.detached) {
-      stopBackgroundService();
+      print(Type.getType());
+      if (Type.getType() == "parent") stopBackgroundService();
     }
   }
 
