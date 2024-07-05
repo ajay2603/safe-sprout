@@ -6,9 +6,7 @@ require("dotenv").config();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-mongoose.connect(
-  "mongodb://127.0.0.1:27017/safeSproutDB?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.1"
-);
+mongoose.connect(process.env.DB_CONNECTOR);
 
 const clearSocketData = require("./utilities/clearsocketdata");
 
