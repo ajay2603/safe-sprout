@@ -33,11 +33,17 @@ const childSchema = mongoose.Schema({
         type: Date,
       },
       locations: [
-        {
-          latitude: Number,
-          longitude: Number,
-        },
+        [
+          {
+            latitude: Number,
+            longitude: Number,
+          },
+        ],
       ],
+      continue: {
+        type: Boolean,
+        default: true,
+      },
     },
   ],
   parent: {

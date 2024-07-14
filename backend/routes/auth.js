@@ -167,6 +167,16 @@ router.post("/gen/token", (req, res) => {
                       );
                     }
                   });
+                  Child.findOne({ _id: payload.id }).then((ch) => {
+                    ch.history[ch.history.length - 1].continue = false;
+                    let List = ch.history[ch.history.length - 1].locations;
+                    let lastList = List[List.length - 1];
+                    let len = lastList.length;
+                    if (len != 0) {
+                      ch.history[ch.history.length - 1].locations.push([]);
+                    }
+                    ch.save();
+                  });
                   res
                     .status(200)
                     .json({ message: "token created success", token: token });

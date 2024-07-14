@@ -9,6 +9,8 @@ const { getIO } = require("../sockets/socket");
 
 const { ParentSocketMap } = require("../database/socket_map");
 
+const { getCurrentDayLoc } = require("../utilities/datesfetch");
+
 router.get("/all", async (req, res) => {
   const token = req.headers.authorization;
   try {
@@ -108,7 +110,6 @@ router.post("/gen/child-id", (req, res) => {
                   });
                   return;
                 }
-
                 chh.tracking = true;
                 chh.save().then(() => {
                   const IO = getIO();
@@ -128,6 +129,22 @@ router.post("/gen/child-id", (req, res) => {
                   }
                 });
               }
+
+              Child.findOne({ _id: childID }).then((ch) => {
+                if (ch.history.length != 0) {
+                  ch.history[ch.history.length - 1].continue = true;
+                  let list = ch.history[ch.history.length - 1].locations;
+                  if (list.length == 0) {
+                    ch.history[ch.history.length - 1].locations.push([]);
+                  } else {
+                    let lastList = list[list.length - 1];
+                    if (lastList.length != 0) {
+                      ch.history[ch.history.length - 1].locations.push([]);
+                    }
+                  }
+                  ch.save();
+                }
+              });
 
               res
                 .status(200)

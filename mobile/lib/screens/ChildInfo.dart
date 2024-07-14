@@ -10,6 +10,7 @@ import 'package:mobile/utilities/permisions.dart';
 import 'package:mobile/utilities/secure_storage.dart';
 import 'package:mobile/utilities/status.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class ChildInfo extends StatefulWidget {
   late Child child;
@@ -128,54 +129,66 @@ class _Child extends State<ChildInfo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Safe Sprout"),
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding:
-                  EdgeInsets.only(top: 10, left: 22, right: 20, bottom: 20),
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: setBgColor(widget.child.tracking, widget.child.live,
-                    widget.child.safe),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "ID: ${widget.child.id}",
-                    style: TextStyle(fontWeight: FontWeight.w300),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "${widget.child.name}",
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "Status: ${setStatus(widget.child.tracking, widget.child.live, widget.child.safe)}",
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
-                  )
-                ],
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () => {validate(context)},
-              child: Text("Track this device"),
-            ),
-          ],
+    return Consumer<ChildrenListProvider>(builder: (context, provider, _) {
+      // Extract child from provider
+      Child updatedChild = provider.childrenMap[widget.child.id];
+
+      // Use updated child data
+      bool live = updatedChild.live;
+      bool tracking = updatedChild.tracking;
+      bool safe = updatedChild.safe;
+      String name = updatedChild.name;
+
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Safe Sprout"),
         ),
-      ),
-    );
+        body: Center(
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding:
+                    EdgeInsets.only(top: 10, left: 22, right: 20, bottom: 20),
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: setBgColor(tracking, live, safe),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "ID: ${widget.child.id}",
+                      style: TextStyle(fontWeight: FontWeight.w300),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "${widget.child.name}",
+                      style:
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Status: ${setStatus(tracking, live, safe)}",
+                      style:
+                          TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                    )
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => {validate(context)},
+                child: Text("Track this device"),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }

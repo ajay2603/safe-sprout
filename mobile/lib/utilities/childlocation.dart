@@ -34,7 +34,7 @@ Future<void> initializeParentService() async {
     androidConfiguration: AndroidConfiguration(
       autoStart: true,
       onStart: onParentStart,
-      isForegroundMode: true, // Set to true for foreground service
+      isForegroundMode: false, // Set to true for foreground service
       autoStartOnBoot: false,
     ),
   );
@@ -52,7 +52,7 @@ Future<void> initializeChildService() async {
     androidConfiguration: AndroidConfiguration(
       autoStart: true,
       onStart: onChildStart,
-      isForegroundMode: false, // Set to true for foreground service
+      isForegroundMode: true, // Set to true for foreground service
       autoStartOnBoot: true,
     ),
   );

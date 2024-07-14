@@ -6,15 +6,11 @@ require("dotenv").config();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-mongoose.connect(process.env.DB_CONNECTOR);
-
 const clearSocketData = require("./utilities/clearsocketdata");
 
-const clear = async () => {
-  await clearSocketData();
-};
-
-clear();
+mongoose.connect(process.env.DB_CONNECTOR).then((_) => {
+  clearSocketData();
+});
 
 const userAuthRoutes = require("./routes/auth");
 app.use("/user/auth", userAuthRoutes);

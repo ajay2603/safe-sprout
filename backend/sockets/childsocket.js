@@ -5,6 +5,7 @@ const updatetoparent = require("../utilities/sockets/child_sockets/updatetoparen
 const childSocket = (socket, payload, IO) => {
   console.log(payload);
 
+
   ChildSocketMap.findOne({ childID: payload.id })
     .then((child) => {
       if (child) {
@@ -32,6 +33,7 @@ const childSocket = (socket, payload, IO) => {
 
   socket.on("disconnect", () => {
     ChildSocketMap.findOneAndDelete({ socketID: socket.id }).then((_) => {});
+    
   });
 
   socket.on("location", (data) => {
