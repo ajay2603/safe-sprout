@@ -21,6 +21,10 @@ app.use("/child", childRoutes);
 const userRoutes = require("./routes/user");
 app.use("/user", userRoutes);
 
+app.get("/", (req,res) => {
+  res.send("This is Safe sprout backend")
+});
+
 const http = require("http");
 const server = http.createServer(app);
 const socketIO = require("socket.io");
